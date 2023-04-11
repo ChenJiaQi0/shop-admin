@@ -14,7 +14,7 @@
                     <span class="h-[1px] w-16 bg-gray-200"></span>
                 </div>
                 <el-form :model="form" :rules="rules" ref="formRef">
-                    <el-form-item prop="username">
+                    <el-form-item prop="username" label=" ">
                         <el-input placeholder="Username" v-model="form.username">
                             <template #prefix>
                                 <el-icon>
@@ -24,7 +24,7 @@
                         </el-input>
                     </el-form-item>
 
-                    <el-form-item prop="password">
+                    <el-form-item prop="password" label=" ">
                         <el-input type="password" placeholder="Password" v-model="form.password">
                             <template #prefix>
                                 <el-icon>
@@ -49,8 +49,10 @@ import { reactive, ref } from "vue"
 import { adminLogin } from '~/api/http'
 import { useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
+import { useCookies } from '@vueuse/integrations/useCookies'
 
 const router = useRouter()
+
 
 const form = reactive({
     username: 'admin',
@@ -87,6 +89,9 @@ const onSubmit = () =>{
         adminLogin(form.username, form.password).then((res)=>{
             // console.log(res.data)
             if (res.data.code === 200){
+                //将token存入cookie
+                const cookie = useCookies()
+                cookie.set('admin-token', res.data.data.token)
                 //提示登录成功
                 ElNotification({
                     message: '登录成功',
