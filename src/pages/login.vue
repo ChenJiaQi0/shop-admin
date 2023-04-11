@@ -13,12 +13,24 @@
                     <span class="h-[1px] w-16 bg-gray-200"></span>
                 </div>
                 <el-form>
-                    <el-form-item label="Username">
-                        <el-input placeholder="Username"/>
+                    <el-form-item>
+                        <el-input placeholder="Username">
+                            <template #prefix>
+                                <el-icon>
+                                    <user />
+                                </el-icon>
+                            </template>
+                        </el-input>
                     </el-form-item>
 
-                    <el-form-item label="Password">
-                        <el-input type="password" placeholder="Password"/>
+                    <el-form-item>
+                        <el-input type="password" placeholder="Password">
+                            <template #prefix>
+                                <el-icon>
+                                    <lock />
+                                </el-icon>
+                            </template>    
+                        </el-input>
                     </el-form-item>
 
                     <el-form-item>
