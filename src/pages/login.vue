@@ -35,7 +35,8 @@
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="primary" size="default" class="w-full py-4 bg-indigo-600 text-white rounded-full" @click="onSubmit">登 录</el-button>
+                        <el-button type="primary" size="default" class="w-full py-4 bg-indigo-600 text-white rounded-full" 
+                            @click="onSubmit" :loading="loading">登 录</el-button>
                     </el-form-item>
 
                 </el-form>
@@ -49,10 +50,12 @@ import { reactive, ref } from "vue"
 import { adminLogin } from '~/api/http'
 import { useRouter } from 'vue-router'
 import { ElNotification } from 'element-plus'
-import { useCookies } from '@vueuse/integrations/useCookies'
+// import { useCookies } from '@vueuse/integrations/useCookies'
+import { setToken } from '~/utils/util'
+
 
 const router = useRouter()
-
+const loading = ref(false)
 
 const form = reactive({
     username: 'admin',
@@ -85,13 +88,15 @@ const onSubmit = () =>{
         if (!valid){
             return false;
         }
+        loading.value = true
         //发请求
         adminLogin(form.username, form.password).then((res)=>{
             // console.log(res.data)
-            if (res.data.code === 200){
+            if (res.code === 200){
                 //将token存入cookie
-                const cookie = useCookies()
-                cookie.set('admin-token', res.data.data.token)
+                // const cookie = useCookies()
+                // cookie.set('admin-token', res.data.token)
+                setToken(res.data.token)
                 //提示登录成功
                 ElNotification({
                     message: '登录成功',
@@ -106,6 +111,8 @@ const onSubmit = () =>{
                     duration: 1000
                 })
             }
+        }).finally(()=>{
+            loading.value = false
         })
     })
 }
