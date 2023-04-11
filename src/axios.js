@@ -1,8 +1,9 @@
 // 自定义axios的实例
 import axios from "axios"
 // import { useCookies } from '@vueuse/integrations/useCookies'
-import { ElNotification } from 'element-plus'
-import { getToken } from '~/utils/util'
+// import { ElNotification } from 'element-plus'
+import { getToken } from '~/utils/auth'
+import { toast } from '~/utils/toast'
 
 const service = axios.create({
     baseURL: "http://127.0.0.1:4523/m1/2571721-0-default/api"
@@ -29,11 +30,12 @@ service.interceptors.response.use((res) => {
     //对响应数据处理
     return res.data
 }, (error) => {
-    ElNotification({
-        message: error.response.data.message || '请求失败',
-        type: 'error',
-        duration: 1000
-    })
+    // ElNotification({
+    //     message: error.response.data.message || '请求失败',
+    //     type: 'error',
+    //     duration: 1000
+    // })
+    toast(error.response.data.message || '请求失败', 'error')
     return Promise.reject(error)
 })
 

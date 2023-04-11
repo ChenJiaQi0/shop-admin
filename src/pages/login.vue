@@ -49,13 +49,16 @@
 import { reactive, ref } from "vue"
 import { adminLogin } from '~/api/http'
 import { useRouter } from 'vue-router'
-import { ElNotification } from 'element-plus'
+// import { ElNotification } from 'element-plus'
 // import { useCookies } from '@vueuse/integrations/useCookies'
-import { setToken } from '~/utils/util'
-
+import { setToken } from '~/utils/auth'
+import { toast } from '~/utils/toast'
+import { useAdmin } from '~/store'
 
 const router = useRouter()
 const loading = ref(false)
+const store = useAdmin()
+const { setStoreToken } = store
 
 const form = reactive({
     username: 'admin',
@@ -97,19 +100,22 @@ const onSubmit = () =>{
                 // const cookie = useCookies()
                 // cookie.set('admin-token', res.data.token)
                 setToken(res.data.token)
+                setStoreToken(res.data.token)
                 //提示登录成功
-                ElNotification({
-                    message: '登录成功',
-                    type: 'success',
-                    duration: 1000
-                })
+                // ElNotification({
+                //     message: '登录成功',
+                //     type: 'success',
+                //     duration: 1000
+                // })
+                toast('登录成功')
                 router.push('/')
             }else{
-                ElNotification({
-                    message: '请求失败',
-                    type: 'error',
-                    duration: 1000
-                })
+                // ElNotification({
+                //     message: '请求失败',
+                //     type: 'error',
+                //     duration: 1000
+                // })
+                toast('登录失败','error')
             }
         }).finally(()=>{
             loading.value = false
