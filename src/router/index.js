@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import Admin from '~/layouts/admin.vue'
 import Index from '~/pages/index.vue'
-import About from '~/pages/about.vue'
 import NotFound from '~/pages/404.vue'
 import Login from '~/pages/login.vue'
 
@@ -8,18 +8,16 @@ const routes = [
     {
         path: '/',
         name: 'index',
-        component: Index,
-        meta: {
-            title: '首页'
-        }
-    },
-    {
-        path: '/about',
-        name: 'about',
-        component: About,
-        meta: {
-            title: '关于'
-        }
+        component: Admin,
+        children: [
+            {
+                path: '/',
+                component: Index,
+                meta: {
+                    title: '首页'
+                }
+            }
+        ]
     },
     {
         path: '/login',

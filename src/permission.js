@@ -1,9 +1,12 @@
-import { getToken } from '~/utils/auth'
+import { getToken } from '~/composables/auth'
 import router from '~/router'
-import { toast } from '~/utils/toast'
+import { toast, showFullLoading, hideFullLoading } from '~/composables/util'
 
 //全局路由前置守卫
 router.beforeEach((to, from, next) => {
+    //显示进度条
+    showFullLoading()
+
     const token = getToken()
     if (!token && to.path != '/login') {
         //没有登录,强制退回登录页
@@ -25,3 +28,6 @@ router.beforeEach((to, from, next) => {
 
     next()
 })
+
+//全局后置守卫
+router.afterEach((to, from) => hideFullLoading())

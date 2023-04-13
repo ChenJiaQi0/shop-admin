@@ -47,18 +47,14 @@
 
 <script setup>
 import { reactive, ref } from "vue"
-import { adminLogin } from '~/api/http'
 import { useRouter } from 'vue-router'
-// import { ElNotification } from 'element-plus'
-// import { useCookies } from '@vueuse/integrations/useCookies'
-import { setToken } from '~/utils/auth'
-import { toast } from '~/utils/toast'
-import { useAdmin } from '~/store'
+import { toast } from '~/composables/util'
+import { useAdminStore } from '~/store'
 
 const router = useRouter()
 const loading = ref(false)
-const store = useAdmin()
-const { setStoreToken } = store
+const store = useAdminStore()
+const { adminLogin } = store
 
 const form = reactive({
     username: 'admin',
@@ -86,40 +82,22 @@ const rules = {
 const formRef = ref(null)
 
 const onSubmit = () =>{
-    console.log(formRef.value)
+    // console.log(formRef.value)
     formRef.value.validate((valid)=>{
         if (!valid){
             return false;
         }
         loading.value = true
         //发请求
-        adminLogin(form.username, form.password).then((res)=>{
-            // console.log(res.data)
-            if (res.code === 200){
-                //将token存入cookie
-                // const cookie = useCookies()
-                // cookie.set('admin-token', res.data.token)
-                setToken(res.data.token)
-                setStoreToken(res.data.token)
-                //提示登录成功
-                // ElNotification({
-                //     message: '登录成功',
-                //     type: 'success',
-                //     duration: 1000
-                // })
-                toast('登录成功')
-                router.push('/')
-            }else{
-                // ElNotification({
-                //     message: '请求失败',
-                //     type: 'error',
-                //     duration: 1000
-                // })
-                toast('登录失败','error')
-            }
-        }).finally(()=>{
-            loading.value = false
-        })
+        setTimeout(()=>{
+            adminLogin(form.username, form.password).then((res)=>{
+                toast(res.msg)
+                if (res.code === 1){
+                    router.push('/')
+                }
+                loading.value = false
+            })
+        },1000)
     })
 }
 </script>
