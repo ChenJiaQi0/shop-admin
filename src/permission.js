@@ -1,6 +1,9 @@
 import { getToken } from '~/composables/auth'
 import router from '~/router'
 import { toast, showFullLoading, hideFullLoading } from '~/composables/util'
+// import { useAdminStore } from '~/store'
+// const { store } = useAdminStore()
+// const { getInfo } = store
 
 //全局路由前置守卫
 router.beforeEach((to, from, next) => {
@@ -21,6 +24,10 @@ router.beforeEach((to, from, next) => {
             path: from.path ? from.path : '/'
         })
     }
+
+    // if (token) {
+    //     getInfo()
+    // }
 
     //设置页面标题
     let title = '极客空间 - ' + (to.meta.title ? to.meta.title : '')

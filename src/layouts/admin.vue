@@ -22,6 +22,6 @@ import FMenu from './components/FMenu.vue'
 import FTagList from './components/FTagList.vue';
 </script>
 
-<style lang="scss" scoped>
+<style>
 
 </style>

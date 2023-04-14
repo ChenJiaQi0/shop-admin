@@ -10,7 +10,8 @@ export const useAdminStore = defineStore('admin', {
             // role: 'admin',
             // nickname: '管理员',
             // avatar: ''
-        }
+        },
+        sideWidth: '220px'
     }),
     actions: {
         // setStoreToken(token) {
@@ -38,6 +39,10 @@ export const useAdminStore = defineStore('admin', {
         },
         async updatepassword(data) {
             return await updatepassword(data)
+        },
+        //伸缩
+        handleSideWidth() {
+            this.sideWidth = this.sideWidth === '220px' ? '80px' : '220px'
         }
 
     }

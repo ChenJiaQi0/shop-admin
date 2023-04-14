@@ -1,17 +1,18 @@
 <template>
-    <div class="v-center bg-indigo-700 text-light-50 fixed top-0 left-0 right-0 h-16">
-        <div class="v-center text-xl w-48 ml-2">
-            <el-icon class="mr-1 text-3xl">
+    <div class="f-header v-center bg-indigo-700 text-light-50 fixed top-0 left-0 right-0 h-16">
+        <div class="f-center text-xl bg-blue-500 h-[100%]" :style="{width: sideWidth}">
+            <el-icon size="30">
                 <ElementPlus />
             </el-icon>
-            极客空间
+            <span v-if="sideWidth === '220px'">极客空间</span>
         </div>
         <el-icon class="icon-btn">
-            <Fold />
+            <Fold v-if="sideWidth === '220px'" @click="handleSideWidth"/>
+            <Expand v-else @click="handleSideWidth"/>
         </el-icon>
 
         <div class="v-center ml-auto">
-            <el-icon class="icon-btn">
+            <el-icon class="icon-btn" @click="$router.go(0)">
                 <Refresh />
             </el-icon>
             <el-icon class="icon-btn" @click="toggle">
@@ -43,8 +44,7 @@
         </div>
     </div>
 
-    <!-- 抽屉 -->
-    <el-drawer v-model="showDrawer" title="修改密码" size="30%" :close-on-click-modal="false">
+    <FormDrawer ref="formDrawerRef" destroyOnClose @submit="onSubmit">
         <el-form label-width="80px" ref="formRef" :rules="rules" :model="form">
           <el-form-item label="旧密码" prop="oldpassword">
             <el-input placeholder="请输入旧密码" v-model="form.oldpassword"></el-input>
@@ -55,11 +55,8 @@
           <el-form-item label="确认密码" prop="repassword">
             <el-input type="password" placeholder="请输入确认密码" show-password v-model="form.repassword"></el-input>
           </el-form-item>
-          <el-form-item>
-            <el-button class="btn" @click="UpdatePass" :loading="loading">提交</el-button>
-          </el-form-item>
         </el-form>
-    </el-drawer>
+    </FormDrawer>
 </template>
 
 <script setup>
@@ -69,11 +66,12 @@ import { useRouter } from 'vue-router';
 import { showModal, toast } from '~/composables/util'
 import { useFullscreen } from '@vueuse/core'
 import { reactive, ref } from 'vue';
+import FormDrawer from '~/components/formDrawer.vue';
 
 const {isFullscreen, toggle} = useFullscreen()
 const store = useAdminStore()
-const {adminInfo} = storeToRefs(store)
-const {getInfo, adminLogout, updatepassword} = store
+const {adminInfo, sideWidth} = storeToRefs(store)
+const {getInfo, adminLogout, updatepassword, handleSideWidth} = store
 const router = useRouter()
 
 
@@ -89,8 +87,10 @@ const handleLogout = ()=>{
 
 // 修改密码相关
 const showDrawer = ref(false)
+const formDrawerRef = ref(null)
 const rePassword = () =>{
-    showDrawer.value = true
+    // showDrawer.value = true
+    formDrawerRef.value.open()
 }
 
 const form = reactive({
@@ -103,7 +103,6 @@ const form = reactive({
 })
 
 const formRef = ref(null)
-const loading = ref(false)
 
 const rePassRule = (rule, value, callback)=>{
     if(value === ''){
@@ -140,12 +139,12 @@ const rules = {
 }
 
 //提交修改密码
-const UpdatePass = ()=>{
+const onSubmit = ()=>{
     formRef.value.validate((valid)=>{
         if (!valid){
             return false
         }
-        loading.value = true
+        formDrawerRef.value.showLoading()
         setTimeout(()=>{
             updatepassword(form).then((res)=>{
                 if (res.code === 1){
@@ -155,17 +154,22 @@ const UpdatePass = ()=>{
                     console.log(res)
                 }else{
                     toast(res.msg,'error')
-                    form.oldpassword = '123456'
-                    form.password = 'admin'
-                    form.repassword = 'admin'
+                    resetForm()
                 }
             })
             .finally(()=> {
-                loading.value = false
-                showDrawer.value = false
+                formDrawerRef.value.close()
+                formDrawerRef.value.hideLoading()
             })
         },1000);
     })
+}
+
+//重置
+const resetForm = ()=>{
+    form.oldpassword = '123456'
+    form.password = 'admin'
+    form.repassword = 'admin'
 }
 
 
