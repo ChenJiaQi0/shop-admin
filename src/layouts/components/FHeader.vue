@@ -45,18 +45,18 @@
 
     <!-- 抽屉 -->
     <el-drawer v-model="showDrawer" title="修改密码" size="30%" :close-on-click-modal="false">
-        <el-form label-width="80px">
-          <el-form-item label="旧密码">
-            <el-input placeholder="请输入旧密码"></el-input>
+        <el-form label-width="80px" ref="formRef" :rules="rules" :model="form">
+          <el-form-item label="旧密码" prop="oldpassword">
+            <el-input placeholder="请输入旧密码" v-model="form.oldpassword"></el-input>
           </el-form-item>
-          <el-form-item label="新密码">
-            <el-input type="password" placeholder="请输入密码" show-password></el-input>
+          <el-form-item label="新密码" prop="password">
+            <el-input type="password" placeholder="请输入密码" show-password v-model="form.password"></el-input>
           </el-form-item>
-          <el-form-item label="确认密码">
-            <el-input type="password" placeholder="请输入确认密码" show-password></el-input>
+          <el-form-item label="确认密码" prop="repassword">
+            <el-input type="password" placeholder="请输入确认密码" show-password v-model="form.repassword"></el-input>
           </el-form-item>
           <el-form-item>
-            <button type="button" class="bg-indigo-500 text-light-50 w-full p-1 rounded-full">提交</button>
+            <el-button class="btn" @click="UpdatePass" :loading="loading">提交</el-button>
           </el-form-item>
         </el-form>
     </el-drawer>
@@ -68,13 +68,14 @@ import { useAdminStore } from '~/store'
 import { useRouter } from 'vue-router';
 import { showModal, toast } from '~/composables/util'
 import { useFullscreen } from '@vueuse/core'
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 const {isFullscreen, toggle} = useFullscreen()
 const store = useAdminStore()
 const {adminInfo} = storeToRefs(store)
-const {getInfo, adminLogout} = store
+const {getInfo, adminLogout, updatepassword} = store
 const router = useRouter()
+
 
 getInfo()
 
@@ -92,6 +93,80 @@ const rePassword = () =>{
     showDrawer.value = true
 }
 
+const form = reactive({
+    oldpassword: '123456',
+    password: 'admin',
+    repassword: 'admin'
+    // oldpassword: '',
+    // password: '',
+    // repassword: ''
+})
+
+const formRef = ref(null)
+const loading = ref(false)
+
+const rePassRule = (rule, value, callback)=>{
+    if(value === ''){
+        callback(new Error('密码不能为空!'))
+    }else if(value !== form.password){
+        callback(new Error('确认密码必须和新密码一致'))
+    }else{
+        callback()
+    }
+}
+
+const rules = {
+    oldpassword: [
+        {
+            message: '旧密码不能为空',
+            trigger: 'blur',
+            required: true
+        }
+    ],
+    password: [
+        {
+            message: '新密码不能为空',
+            trigger: 'blur',
+            required: true
+        }
+    ],
+    repassword: [
+        {
+            validator: rePassRule,
+            trigger: 'blur',
+            required: true
+        }
+    ]
+}
+
+//提交修改密码
+const UpdatePass = ()=>{
+    formRef.value.validate((valid)=>{
+        if (!valid){
+            return false
+        }
+        loading.value = true
+        setTimeout(()=>{
+            updatepassword(form).then((res)=>{
+                if (res.code === 1){
+                    toast('修改密码成功,请重新登录')
+                    adminLogout()
+                    router.push('/login')
+                    console.log(res)
+                }else{
+                    toast(res.msg,'error')
+                    form.oldpassword = '123456'
+                    form.password = 'admin'
+                    form.repassword = 'admin'
+                }
+            })
+            .finally(()=> {
+                loading.value = false
+                showDrawer.value = false
+            })
+        },1000);
+    })
+}
 
 
 
@@ -104,4 +179,13 @@ const rePassword = () =>{
 .icon-btn:hover{
     @apply bg-indigo-300
 }
+.f-header .dropdown {
+    height: 64px;
+    cursor: pointer;
+    @apply flex justify-center items-center mx-5;
+  }
+  
+  .btn {
+    @apply w-full py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full;
+  }
 </style>
