@@ -1,14 +1,14 @@
 <template>
     <div class="f-header v-center bg-indigo-700 text-light-50 fixed top-0 left-0 right-0 h-16">
-        <div class="f-center text-xl bg-blue-500 h-[100%]" :style="{width: sideWidth}">
+        <div class="f-center text-xl bg-blue-500 h-[100%] transition-all duration-500" :style="{width: sideWidth}">
             <el-icon size="30">
                 <ElementPlus />
             </el-icon>
             <span v-if="sideWidth === '220px'">极客空间</span>
         </div>
-        <el-icon class="icon-btn">
-            <Fold v-if="sideWidth === '220px'" @click="handleSideWidth"/>
-            <Expand v-else @click="handleSideWidth"/>
+        <el-icon class="icon-btn" @click="handleSideWidth">
+            <Fold v-if="sideWidth === '220px'"/>
+            <Expand v-else />
         </el-icon>
 
         <div class="v-center ml-auto">
@@ -68,6 +68,17 @@ import { useFullscreen } from '@vueuse/core'
 import { reactive, ref } from 'vue';
 import FormDrawer from '~/components/formDrawer.vue';
 
+import { useLogout, useRepassword} from '~/composables/useAdmin'
+const { handleLogout } = useLogout()
+const {
+    formDrawerRef,
+    form,
+    rules,
+    formRef,
+    onSubmit,
+    openRepasswordForm
+} = useRepassword()
+
 const {isFullscreen, toggle} = useFullscreen()
 const store = useAdminStore()
 const {adminInfo, sideWidth} = storeToRefs(store)
@@ -77,93 +88,94 @@ const router = useRouter()
 
 getInfo()
 
-const handleLogout = ()=>{
-    showModal('是否要退出登录?').then(()=>{
-        adminLogout()
-        toast('退出登录成功')
-        router.push('/login')
-    })
-}
+// const handleLogout = ()=>{
+//     showModal('是否要退出登录?').then(()=>{
+//         adminLogout()
+//         toast('退出登录成功')
+//         router.push('/login')
+//     })
+// }
 
-// 修改密码相关
-const showDrawer = ref(false)
-const formDrawerRef = ref(null)
+// // 修改密码相关
+// const showDrawer = ref(false)
+// const formDrawerRef = ref(null)
 const rePassword = () =>{
     // showDrawer.value = true
-    formDrawerRef.value.open()
+    // formDrawerRef.value.open()
+    openRepasswordForm()
 }
 
-const form = reactive({
-    oldpassword: '123456',
-    password: 'admin',
-    repassword: 'admin'
-    // oldpassword: '',
-    // password: '',
-    // repassword: ''
-})
+// const form = reactive({
+//     oldpassword: '123456',
+//     password: 'admin',
+//     repassword: 'admin'
+//     // oldpassword: '',
+//     // password: '',
+//     // repassword: ''
+// })
 
-const formRef = ref(null)
+// const formRef = ref(null)
 
-const rePassRule = (rule, value, callback)=>{
-    if(value === ''){
-        callback(new Error('密码不能为空!'))
-    }else if(value !== form.password){
-        callback(new Error('确认密码必须和新密码一致'))
-    }else{
-        callback()
-    }
-}
+// const rePassRule = (rule, value, callback)=>{
+//     if(value === ''){
+//         callback(new Error('密码不能为空!'))
+//     }else if(value !== form.password){
+//         callback(new Error('确认密码必须和新密码一致'))
+//     }else{
+//         callback()
+//     }
+// }
 
-const rules = {
-    oldpassword: [
-        {
-            message: '旧密码不能为空',
-            trigger: 'blur',
-            required: true
-        }
-    ],
-    password: [
-        {
-            message: '新密码不能为空',
-            trigger: 'blur',
-            required: true
-        }
-    ],
-    repassword: [
-        {
-            validator: rePassRule,
-            trigger: 'blur',
-            required: true
-        }
-    ]
-}
+// const rules = {
+//     oldpassword: [
+//         {
+//             message: '旧密码不能为空',
+//             trigger: 'blur',
+//             required: true
+//         }
+//     ],
+//     password: [
+//         {
+//             message: '新密码不能为空',
+//             trigger: 'blur',
+//             required: true
+//         }
+//     ],
+//     repassword: [
+//         {
+//             validator: rePassRule,
+//             trigger: 'blur',
+//             required: true
+//         }
+//     ]
+// }
 
 //提交修改密码
-const onSubmit = ()=>{
-    formRef.value.validate((valid)=>{
-        if (!valid){
-            return false
-        }
-        formDrawerRef.value.showLoading()
-        setTimeout(()=>{
-            updatepassword(form).then((res)=>{
-                if (res.code === 1){
-                    toast('修改密码成功,请重新登录')
-                    adminLogout()
-                    router.push('/login')
-                    console.log(res)
-                }else{
-                    toast(res.msg,'error')
-                    resetForm()
-                }
-            })
-            .finally(()=> {
-                formDrawerRef.value.close()
-                formDrawerRef.value.hideLoading()
-            })
-        },1000);
-    })
-}
+// const onSubmit = ()=>{
+//     formRef.value.validate((valid)=>{
+//         if (!valid){
+//             return false
+//         }
+//         formDrawerRef.value.showLoading()
+//         setTimeout(()=>{
+//             updatepassword(form).then((res)=>{
+//                 if (res.code === 1){
+//                     toast('修改密码成功,请重新登录')
+//                     adminLogout()
+//                     router.push('/login')
+//                     console.log(res)
+//                 }else{
+//                     toast(res.msg,'error')
+//                     resetForm()
+//                 }
+//             })
+//             .finally(()=> {
+//                 formDrawerRef.value.close()
+//                 formDrawerRef.value.hideLoading()
+//             })
+//         },1000);
+//     })
+// }
 
 //重置
 const resetForm = ()=>{

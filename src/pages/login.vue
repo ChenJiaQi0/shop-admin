@@ -50,56 +50,59 @@ import { reactive, ref } from "vue"
 import { useRouter } from 'vue-router'
 import { toast } from '~/composables/util'
 import { useAdminStore } from '~/store'
+import { useLogin } from '~/composables/useAdmin'
 
-const router = useRouter()
-const loading = ref(false)
-const store = useAdminStore()
-const { adminLogin } = store
+const { loading, form, formRef, onSubmit } = useLogin()
 
-const form = reactive({
-    username: 'admin',
-    password: 'admin'
-})
+// const router = useRouter()
+// const loading = ref(false)
+// const store = useAdminStore()
+// const { adminLogin } = store
 
-//检验规则
-const rules = {
-    username: [
-        {
-            required: true,
-            message: '用户名不能为空',
-            trigger: 'blur'
-        }
-    ],
-    password: [
-        {
-            required: true,
-            message: '密码不能为空',
-            trigger: 'blur'
-        }
-    ],
-}
+// const form = reactive({
+//     username: 'admin',
+//     password: 'admin'
+// })
 
-const formRef = ref(null)
+// //检验规则
+// const rules = {
+//     username: [
+//         {
+//             required: true,
+//             message: '用户名不能为空',
+//             trigger: 'blur'
+//         }
+//     ],
+//     password: [
+//         {
+//             required: true,
+//             message: '密码不能为空',
+//             trigger: 'blur'
+//         }
+//     ],
+// }
 
-const onSubmit = () =>{
-    // console.log(formRef.value)
-    formRef.value.validate((valid)=>{
-        if (!valid){
-            return false;
-        }
-        loading.value = true
-        //发请求
-        setTimeout(()=>{
-            adminLogin(form.username, form.password).then((res)=>{
-                toast(res.msg)
-                if (res.code === 1){
-                    router.push('/')
-                }
-                loading.value = false
-            })
-        },1000)
-    })
-}
+// const formRef = ref(null)
+
+// const onSubmit = () =>{
+//     // console.log(formRef.value)
+//     formRef.value.validate((valid)=>{
+//         if (!valid){
+//             return false;
+//         }
+//         loading.value = true
+//         //发请求
+//         setTimeout(()=>{
+//             adminLogin(form.username, form.password).then((res)=>{
+//                 toast(res.msg)
+//                 if (res.code === 1){
+//                     router.push('/')
+//                 }
+//                 loading.value = false
+//             })
+//         },1000)
+//     })
+// }
 </script>
 
 <style lang="scss" scoped>
