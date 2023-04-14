@@ -11,7 +11,10 @@ export const useAdminStore = defineStore('admin', {
             // nickname: '管理员',
             // avatar: ''
         },
-        sideWidth: '220px'
+        sideWidth: '220px',
+        menus: [
+
+        ]
     }),
     actions: {
         // setStoreToken(token) {
@@ -30,7 +33,9 @@ export const useAdminStore = defineStore('admin', {
         },
         async getInfo() {
             const res = await getInfo()
-            this.adminInfo = res.data
+            this.adminInfo = res.data.adminInfo
+            this.menus = res.data.menus
+            return res
         },
         async adminLogout() {
             logout()
